@@ -59,12 +59,31 @@ endif()
 ExternalProject_Get_property(imgui SOURCE_DIR)
 set(IMGUI_SOURCE_DIR ${SOURCE_DIR})]]
 
+ExternalProject_Add(opencv_contrib
+    PREFIX                  ${LIBRARIES_PREFIX}/opencv_contrib
+    GIT_REPOSITORY          https://github.com/opencv/opencv_contrib.git
+    GIT_TAG                 4.5.5
+    #CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/opencv
+                            
+                            
+    UPDATE_DISCONNECTED     FALSE
+    UPDATE_COMMAND          ""
+    BUILD_COMMAND           ""
+    CONFIGURE_COMMAND       ""
+    INSTALL_COMMAND         ""
+    BUILD_ALWAYS            FALSE
+)
+
+
 ExternalProject_Add(opencv
     PREFIX                  ${LIBRARIES_PREFIX}/opencv
+    DEPENDS                 opencv_contrib
     GIT_REPOSITORY          https://github.com/opencv/opencv.git
     GIT_TAG                 4.5.5
     CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/opencv
-    CMAKE_CACHE_ARGS        -DBUILD_SHARED_LIBS:BOOL=OFF
+    CMAKE_CACHE_ARGS        -DOPENCV_EXTRA_MODULES_PATH:PATH=${LIBRARIES_PREFIX}/opencv_contrib/src/opencv_contrib/modules
+                            -DBUILD_opencv_face:BOOL=ON
+                            -DBUILD_SHARED_LIBS:BOOL=OFF
                             -DBUILD_TESTS:BOOL=OFF
                             -DBUILD_PERF_TESTS:BOOL=OFF
                             -DBUILD_PERF_TESTS:BOOL=OFF
@@ -86,7 +105,9 @@ ExternalProject_Add(opencv_sandbox
     DEPENDS             opencv
     SOURCE_DIR          ${PROJECT_SOURCE_DIR}/../
     CMAKE_ARGS          
-    CMAKE_CACHE_ARGS    -DCMAKE_PREFIX_PATH:STRING=${LIBRARIES_INSTALL_PREFIX}/opencv
+    CMAKE_CACHE_ARGS    #-DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/opencv
+                        -DOpenCV_DIR:PATH=${LIBRARIES_INSTALL_PREFIX}/opencv
+                        -DOpenCV_STATIC:BOOL=TRUE
                         
     BUILD_ALWAYS        TRUE
     INSTALL_COMMAND     ""

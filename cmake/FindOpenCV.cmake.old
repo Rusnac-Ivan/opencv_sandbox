@@ -1,0 +1,39 @@
+# Locate the opencv library
+#
+# This module defines the following variables:
+#
+#
+# To help locate the library and include file, you can define a
+# variable called OPENCV_ROOT which points to the root of the opencv library
+# installation.
+#
+# default search dirs
+# 
+# Cmake file from: https://github.com/daw42/glslcookbook
+
+set( _opencv_HEADER_SEARCH_DIRS
+"/usr/include"
+"/usr/local/include"
+"${CMAKE_SOURCE_DIR}/includes"
+"C:/Program Files (x86)/opencv/include" )
+set( _opencv_LIB_SEARCH_DIRS
+"/usr/lib"
+"/usr/local/lib"
+"${CMAKE_SOURCE_DIR}/lib"
+"C:/Program Files (x86)/opencv/lib-msvc110" )
+
+
+
+# Put user specified location at beginning of search
+if( OPENCV_ROOT )
+	list( INSERT _opencv_HEADER_SEARCH_DIRS 0 "${OPENCV_ROOT}/include" )
+	list( INSERT _opencv_LIB_SEARCH_DIRS 0 "${OPENCV_ROOT}/x64" )
+endif()
+
+# Search for the header
+FIND_PATH(GLFW3_INCLUDE_DIR "opencv2/cvconfig.h" PATHS ${_glfw3_HEADER_SEARCH_DIRS} )
+
+# Search for the library
+FIND_LIBRARY(OPENCV_LIBRARY NAMES opencv PATHS ${_opencv_LIB_SEARCH_DIRS} )
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(OPENCV DEFAULT_MSG OPENCV_LIBRARY OPENCV_INCLUDE_DIR)

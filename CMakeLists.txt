@@ -34,6 +34,6 @@ endforeach()
 
 add_executable(${PROJECT_NAME} ${INCLUDE_LIST} ${SOURCE_FILES})
 
-find_package( OpenCV REQUIRED )
+find_package( OpenCV REQUIRED core face features2d videoio ccalib calib3d)
 target_include_directories(${PROJECT_NAME} PRIVATE ${OpenCV_INCLUDE_DIRS} )
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} )
