@@ -4,7 +4,7 @@
 using namespace cv; 
 using namespace std; 
 
-#define COLOR Scalar(255, 200,0)
+#define _COLOR_ Scalar(255, 200,0)
 
 // drawPolyLine draws a poly line by joining 
 // successive points between the start and end indices. 
@@ -24,7 +24,7 @@ void drawPolyline
         points.push_back(cv::Point(landmarks[i].x, landmarks[i].y));
     }
     // Draw polylines. 
-    polylines(im, points, isClosed, COLOR, 2, 16);
+    polylines(im, points, isClosed, _COLOR_, 2, 16);
     
 }
 
@@ -50,7 +50,7 @@ void drawLandmarks(Mat &im, vector<Point2f> &landmarks)
       // one dot per landamrk. 
       for(int i = 0; i < landmarks.size(); i++)
       {
-        circle(im,landmarks[i],3, COLOR, FILLED);
+        circle(im,landmarks[i],3, _COLOR_, FILLED);
       }
     }
     

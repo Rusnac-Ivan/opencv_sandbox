@@ -8,10 +8,13 @@ using namespace cv;
 using namespace cv::face;
 
 #include <iostream>
+#include <Core/Application.h>
 
 int main(int argc,char** argv)
 {
-    CommandLineParser parser(argc, argv,
+    Application& app = Application::RunApplication(1280, 720, "Opengl Window");
+
+    /*CommandLineParser parser(argc, argv,
         "{help h||}"
         "{face_cascade|D:/Repositories/opencv_sandbox/build/installed/Windows/opencv/etc/haarcascades/haarcascade_frontalface_alt2.xml|Path to face cascade.}"
         "{camera|0|Camera device number.}");
@@ -87,7 +90,7 @@ int main(int argc,char** argv)
       if (waitKey(1) == 27) break;
       
     }
-    //std::cout << "Hi" << std::endl;
+    //std::cout << "Hi" << std::endl;*/
     
     return 0;
 }

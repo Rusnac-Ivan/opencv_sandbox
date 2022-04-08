@@ -31,7 +31,7 @@ if(NOT DEFINED LIBRARIES_INSTALL_PREFIX)
     set(LIBRARIES_INSTALL_PREFIX ${LIBRARIES_PREFIX}/installed/${CMAKE_SYSTEM_NAME})
 endif()
 
-#[[ExternalProject_Add(glfw
+ExternalProject_Add(glfw
     PREFIX                  ${LIBRARIES_PREFIX}/glfw
     GIT_REPOSITORY          https://github.com/glfw/glfw.git
     GIT_TAG                 3.3.4
@@ -39,13 +39,14 @@ endif()
     CMAKE_CACHE_ARGS        -DGLFW_BUILD_DOCS:BOOL=OFF
                             -DGLFW_BUILD_TESTS:BOOL=OFF
                             -DGLFW_BUILD_EXAMPLES:BOOL=OFF
+                            -DUSE_MSVC_RUNTIME_LIBRARY_DLL:BOOL=ON
                             
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
-)]]
+)
 
-#[[ExternalProject_Add(imgui
+ExternalProject_Add(imgui
     PREFIX                  ${LIBRARIES_PREFIX}/imgui
     DEPENDS                 glfw
     GIT_REPOSITORY          https://github.com/ocornut/imgui.git
@@ -57,7 +58,25 @@ endif()
     INSTALL_COMMAND         ""
 )
 ExternalProject_Get_property(imgui SOURCE_DIR)
-set(IMGUI_SOURCE_DIR ${SOURCE_DIR})]]
+set(IMGUI_SOURCE_DIR ${SOURCE_DIR})
+
+ExternalProject_Add(glm
+    PREFIX                  ${LIBRARIES_PREFIX}/glm
+    GIT_REPOSITORY          https://github.com/g-truc/glm.git
+    GIT_TAG                 master
+    CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/glm
+                            -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d>
+                            -DCMAKE_TOOLCHAIN_FILE:STRING=${CMAKE_TOOLCHAIN_FILE}
+                            -DCMAKE_TOOLCHAIN_ARGS:STRING=${CMAKE_TOOLCHAIN_ARGS}
+    CMAKE_CACHE_ARGS        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+                            -DBUILD_TESTING:BOOL=OFF
+                            
+    #INSTALL_COMMAND         ${CMAKE_COMMAND} -E copy_directory ${LIBRARIES_PREFIX}/glm/src/glm ${LIBRARIES_INSTALL_PREFIX}/glm
+
+    UPDATE_DISCONNECTED     TRUE
+    UPDATE_COMMAND          ""
+    BUILD_ALWAYS            FALSE
+)
 
 ExternalProject_Add(opencv_contrib
     PREFIX                  ${LIBRARIES_PREFIX}/opencv_contrib
@@ -93,6 +112,7 @@ ExternalProject_Add(opencv
                             -DBUILD_opencv_python3:BOOL=OFF
                             -DBUILD_JAVA:BOOL=OFF
                             -DBUILD_FAT_JAVA_LIB:BOOL=OFF
+                            -DBUILD_WITH_STATIC_CRT:BOOL=OFF
                             
                             
     UPDATE_DISCONNECTED     TRUE
@@ -102,12 +122,17 @@ ExternalProject_Add(opencv
 
 ExternalProject_Add(opencv_sandbox
     PREFIX              ${LIBRARIES_PREFIX}/opencv_sandbox
-    DEPENDS             opencv
+    DEPENDS             opencv imgui
     SOURCE_DIR          ${PROJECT_SOURCE_DIR}/../
     CMAKE_ARGS          
     CMAKE_CACHE_ARGS    #-DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/opencv
+                        -DGLFW3_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/glfw
                         -DOpenCV_DIR:PATH=${LIBRARIES_INSTALL_PREFIX}/opencv
+                        -DIMGUI_PATH:PATH=${IMGUI_SOURCE_DIR}
                         -DOpenCV_STATIC:BOOL=TRUE
+                        -Dglm_DIR:PATH=${LIBRARIES_INSTALL_PREFIX}/glm/lib/cmake/glm
+                        -DCMAKE_PREFIX_PATH:STRING=${LIBRARIES_INSTALL_PREFIX}/glm
+                        
                         
     BUILD_ALWAYS        TRUE
     INSTALL_COMMAND     ""
