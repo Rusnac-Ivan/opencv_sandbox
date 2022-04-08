@@ -93,6 +93,21 @@ ExternalProject_Add(opencv_contrib
     BUILD_ALWAYS            FALSE
 )
 
+ExternalProject_Add(GSOC2017
+    PREFIX                  ${LIBRARIES_PREFIX}/GSOC2017
+    GIT_REPOSITORY          https://github.com/kurnianggoro/GSOC2017.git
+    GIT_TAG                 master
+    #CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/opencv
+                            
+                            
+    UPDATE_DISCONNECTED     FALSE
+    UPDATE_COMMAND          ""
+    BUILD_COMMAND           ""
+    CONFIGURE_COMMAND       ""
+    INSTALL_COMMAND         ""
+    BUILD_ALWAYS            FALSE
+)
+
 
 ExternalProject_Add(opencv
     PREFIX                  ${LIBRARIES_PREFIX}/opencv
@@ -103,6 +118,7 @@ ExternalProject_Add(opencv
     CMAKE_CACHE_ARGS        -DOPENCV_EXTRA_MODULES_PATH:PATH=${LIBRARIES_PREFIX}/opencv_contrib/src/opencv_contrib/modules
                             -DBUILD_opencv_face:BOOL=ON
                             -DBUILD_SHARED_LIBS:BOOL=OFF
+                            -DOpenCV_STATIC:BOOL=ON
                             -DBUILD_TESTS:BOOL=OFF
                             -DBUILD_PERF_TESTS:BOOL=OFF
                             -DBUILD_PERF_TESTS:BOOL=OFF
