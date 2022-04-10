@@ -50,7 +50,7 @@ ExternalProject_Add(imgui
     PREFIX                  ${LIBRARIES_PREFIX}/imgui
     DEPENDS                 glfw
     GIT_REPOSITORY          https://github.com/ocornut/imgui.git
-    GIT_TAG                 v1.87
+    GIT_TAG                 v1.82
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     CONFIGURE_COMMAND       ""

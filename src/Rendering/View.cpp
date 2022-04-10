@@ -1,10 +1,13 @@
 #include "View.h"
 #include <GLObjects/Pipeline.h>
 #include <GLObjects/Shader.h>
+
+
 #include <vector>
 #include <fstream>
 
-#define GLSL(str) (const char *)"#version 330\n" #str
+
+
 
 float vertices[] = {
     -0.3f, -0.3f, -0.3f, 0.0f, 0.0f, -1.0f,
@@ -67,7 +70,7 @@ void View::OnDestroy()
 
 void View::OnInitialize()
 {
-    gl::RenderContext::SetClearColor(0.0f, 0.3f, 0.2f, 1.00f);
+    //gl::RenderContext::SetClearColor(0.0f, 0.3f, 0.2f, 1.00f);
     //gl::Pipeline::EnableDepthTest();
 
     //mBishop.AddVBO(std::vector<gl::AttribType>({gl::AttribType::POSITION, gl::AttribType::NORMAL}), __bishop_vert_count, sizeof(__bishop_vert), __bishop_vert);
@@ -155,6 +158,9 @@ void View::OnInitialize()
     mProgram.SetFloat3(mProgram.Uniform("lightColor"), glm::vec3(1.f, 1.f, 1.f));
     mProgram.SetFloat3(mProgram.Uniform("objectColor"), glm::vec3(0.714f, 0.4284, 0.18144));
     mProgram.StopUsing();*/
+
+    //cv::VideoCapture vid_capture("Resources/Cars.mp4");
+    
 }
 
 void View::OnUpdate()
@@ -173,7 +179,7 @@ void View::OnUpdate()
 
     //mProgram.SetMatrix4(mProgram.Uniform("view"), mCamera.GetViewMat());
 
-    gl::RenderContext::Clear(gl::BufferBit::COLOR, gl::BufferBit::DEPTH);
+    
 
     //mProgram.SetMatrix4(mProgram.Uniform("model"), model1);
     //mBishop.Draw(gl::Primitive::TRIANGLES);

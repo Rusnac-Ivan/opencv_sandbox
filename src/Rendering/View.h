@@ -8,6 +8,8 @@
 #include <GLObjects/Program.h>
 #include <Rendering/RubiksCube.h>
 
+
+
 class View
 {
 private:

@@ -1,11 +1,11 @@
-#include <opencv2/opencv.hpp>
-#include <opencv2/face.hpp>
-#include "drawLandmarks.hpp"
+//#include <opencv2/opencv.hpp>
+//#include <opencv2/face.hpp>
+//#include "drawLandmarks.hpp"
 
 
-using namespace std;
-using namespace cv;
-using namespace cv::face;
+//using namespace std;
+//using namespace cv;
+//using namespace cv::face;
 
 #include <iostream>
 #include <Core/Application.h>
