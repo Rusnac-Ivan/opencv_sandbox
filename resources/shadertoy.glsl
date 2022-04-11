@@ -38,11 +38,11 @@ vec4 stars( vec4 O, vec2 U )
     U =  (U+U - R) / R.y;
 	O -= O+.3;
     for (float i=0.; i<99.; i++)
-        O += flare (U) * 0.01;           // rotating flare at random location
-              //* r1(vec4(i+.2))                          // random scale
-              //* (1.+sin(iDate.w+r1(vec4(i+.3))*6.))*.1  // time pulse
-            //* (1.+.1*sr3(i+.4));               // random color - uncorrelated
-              //* (1.+.1*sr3(i));                  // random color - correlated
+        O += flare (U - sr2(i)*R/R.y )           // rotating flare at random location
+              * r1(vec4(i+.2))                          // random scale
+              * (1.+sin(iDate.w+r1(vec4(i+.3))*6.))*.1  // time pulse
+            * (1.+.1*sr3(i+.4))               // random color - uncorrelated
+              * (1.+.1*sr3(i));                  // random color - correlated
     return O;
 }
 
@@ -72,7 +72,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             
             if(radius2 < 0.25)
             {
-                fragColor = vec4(1.0, 1.0, 1.0, 1.0) * starColor;
+                fragColor = color * starColor;
             }
             else
                 fragColor = color;
@@ -80,5 +80,5 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     }
     
     
-	//fragColor = color * starColor;
+	fragColor = color * starColor;
 }

@@ -93,16 +93,16 @@ const char* fragShader = GLSL(
 		vec3 col = texture(screenTexture, TexCoords).rgb;
 		//FragColor = vec4(col, 1.0);
 
-		/*float brightness = dot(col.rgb, vec3(0.2126, 0.7152, 0.0722));
-		if (brightness > 0.6)
+		float brightness = dot(col.rgb, vec3(0.2126, 0.7152, 0.0722));
+		if (brightness > 0.4)
 			FragColor = vec4(col.rgb, 1.0);
 		else
 		{
 			FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-		}*/
+		}
 
-		vec4 starColor = stars(vec4(1.0, 1.0, 1.0, 1.0), TexCoords);
-		FragColor = vec4(col, 1.0);
+		//vec4 starColor = stars(vec4(1.0, 1.0, 1.0, 1.0), TexCoords);
+		//FragColor = vec4(col, 1.0);
 		//FragColor = starColor;
 	}
 );
@@ -249,7 +249,7 @@ void Window::GUI::Init(const char* glsl_version)
 	mQuad = std::make_unique<gl::Vertices>();
 	mQuad->AddVBO(std::vector<gl::AttribType>({ gl::AttribType::POSITION, gl::AttribType::TEXTURE_UV }), vert_count, sizeof(quad_vert), quad_vert);
 
-	mVideo.open("C:/Users/User/Desktop/video1.mp4");
+	mVideo.open("C:/Users/ion/Desktop/video1.mp4");
 
 	if (!mVideo.isOpened())
 	{
@@ -313,7 +313,7 @@ void Window::GUI::Init(const char* glsl_version)
 
 	//opencv
 	//-- 1. Load the cascades
-	if (!faceDetector.load("D:/CPP/opencv_sandbox/build/installed/Windows/opencv/etc/haarcascades/haarcascade_frontalface_alt2.xml"))
+	/*if (!faceDetector.load("D:/CPP/opencv_sandbox/build/installed/Windows/opencv/etc/haarcascades/haarcascade_frontalface_alt2.xml"))
 	{
 		assert("failed face_cascade_name !");
 	};
@@ -324,7 +324,7 @@ void Window::GUI::Init(const char* glsl_version)
 	// Load landmark detector
 	facemark->loadModel("D:/CPP/opencv_sandbox/build/GSOC2017/src/GSOC2017/data/lbfmodel.yaml");
 
-	// Variable to store a video frame and its grayscale 
+	// Variable to store a video frame and its grayscale */
 
 	
 	gl::RenderContext::SetClearColor(0.f, 0.4f, 0.3f, 1.f);
@@ -347,7 +347,7 @@ void Window::GUI::Render()
 void Window::GUI::DrawElements()
 {
 	//render in frame buffer
-	/*mFramebuffer->Bind(gl::BindType::ReadAndDraw);
+	mFramebuffer->Bind(gl::BindType::ReadAndDraw);
 	gl::RenderContext::SetViewport(mAttachedColor->GetWidth(), mAttachedColor->GetHeight());
 	gl::RenderContext::Clear(gl::BufferBit::COLOR);
 	mFrameProgram->Use();
@@ -355,7 +355,7 @@ void Window::GUI::DrawElements()
 	mTexture->Activate(tex_loc);
 	mQuad->Draw(gl::Primitive::TRIANGLES);
 	mFrameProgram->StopUsing();
-	mFramebuffer->UnBind(gl::BindType::ReadAndDraw);*/
+	mFramebuffer->UnBind(gl::BindType::ReadAndDraw);
 
 
 	gl::RenderContext::Clear(gl::BufferBit::COLOR);
@@ -363,7 +363,7 @@ void Window::GUI::DrawElements()
 
 	if (mVideo.read(frame))
 	{
-		cv::Mat gray;
+		/*cv::Mat gray;
 
 		// Find face
 		std::vector<cv::Rect> faces;
@@ -390,7 +390,7 @@ void Window::GUI::DrawElements()
 			{
 				drawLandmarks(frame, landmarks[i]);
 			}
-		}
+		}*/
 
 
 		int videoWidth = frame.cols;
@@ -403,7 +403,7 @@ void Window::GUI::DrawElements()
 
 		ImGui::Image((ImTextureID)mTexture->GetId(), ImVec2(mTexture->GetWidth() / div, mTexture->GetHeight() / div));
 
-		//ImGui::Image((ImTextureID)mAttachedColor->GetId(), ImVec2(mAttachedColor->GetWidth() / div, mAttachedColor->GetHeight() / div));
+		ImGui::Image((ImTextureID)mAttachedColor->GetId(), ImVec2(mAttachedColor->GetWidth() / div, mAttachedColor->GetHeight() / div));
 
 		ImGui::End();
 

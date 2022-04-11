@@ -50,7 +50,7 @@ ExternalProject_Add(imgui
     PREFIX                  ${LIBRARIES_PREFIX}/imgui
     DEPENDS                 glfw
     GIT_REPOSITORY          https://github.com/ocornut/imgui.git
-    GIT_TAG                 v1.82
+    GIT_TAG                 v1.87
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     CONFIGURE_COMMAND       ""
@@ -118,6 +118,7 @@ ExternalProject_Add(opencv
     CMAKE_CACHE_ARGS        -DOPENCV_EXTRA_MODULES_PATH:PATH=${LIBRARIES_PREFIX}/opencv_contrib/src/opencv_contrib/modules
                             -DBUILD_opencv_face:BOOL=ON
                             -DBUILD_SHARED_LIBS:BOOL=OFF
+                            -DBUILD_STATIC_LIBS:BOOL=ON
                             -DOpenCV_STATIC:BOOL=ON
                             -DBUILD_TESTS:BOOL=OFF
                             -DBUILD_PERF_TESTS:BOOL=OFF
