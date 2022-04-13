@@ -17,6 +17,7 @@ std::unique_ptr<gl::Vertices> mQuad;
 //opencv
 cv::CascadeClassifier faceDetector;
 cv::Ptr<cv::face::Facemark> facemark;
+int u_Time_Loc = -1;;
 
 Window* thiz = nullptr;
 
@@ -41,69 +42,108 @@ const char* fragShader = GLSL(
 	in vec2 TexCoords;
 
 	uniform sampler2D screenTexture;
+	uniform vec2 uResolution;
+	uniform float uTime;
 
-
-	float flare(vec2 U)                            // rotating hexagon 
+	mat2 Rot(float a)
 	{
-		vec2 A = sin(vec2(0, 1.57) + 0.0);
-		U = abs(U * mat2(A, -A.y, A.x)) * mat2(2, 0, 1, 1.7);
-		return .2 / max(U.x, U.y);                      // glowing-spiky approx of step(max,.2)
-	  //return .2*pow(max(U.x,U.y), -2.);
-
+		float s = sin(a);
+		float c = cos(a);
+		return mat2(c, -s, s, c);
 	}
 
+	float Star(vec2 uv, float flare) {
+		float d = length(uv);
+		float m = .05 / d;
 
-	vec2 r(vec2 x)
-	{
-		return fract(1e4 * sin((x) * 541.17));
+		float rays = max(0., 1. - abs(uv.x * uv.y * 1000.));
+		m += rays * flare;
+		uv *= Rot(3.1415 / 4.);
+		rays = max(0., 1. - abs(uv.x * uv.y * 1000.));
+		m += rays * .3 * flare;
+
+		m *= smoothstep(0.5, .2, d);
+		return m;
 	}
 
-	vec4 r1(vec4 x)
-	{
-		return fract(1e4 * sin((x) * 541.17));
+	float Hash21(vec2 p) {
+		p = fract(p * vec2(123.34, 456.21));
+		p += dot(p, p + 45.32);
+		return fract(p.x * p.y);
 	}
 
-	vec2 sr2(float x)
-	{
-		return r(vec2(x, x + .1)) * 2. - 1.;
+	vec3 StarLayer(vec2 uv) {
+		vec3 col = vec3(0);
+
+		vec2 gv = fract(uv) - .5;
+		vec2 id = floor(uv);
+
+		for (int y = -1; y <= 1; y++) {
+			for (int x = -1; x <= 1; x++) {
+				vec2 offs = vec2(x, y);
+
+				float n = Hash21(id + offs); // random between 0 and 1
+				float size = 2.0;// fract(n * 345.32);
+
+				float star = Star(gv - offs, smoothstep(2., 1., size) * .6);
+
+				//vec3 color = sin(vec3(.2, .3, .9)*fract(n*2345.2)*123.2)*.5+.5;
+				//color = color*vec3(1,.25,1.+size)+vec3(.2, .2, .1)*2.;
+				vec3 color = vec3(1.0, 1.0, 1.0);
+
+				star *= sin(uTime * 3. + n * 6.2831) * .5 + 1.;
+				col += star * size * color;
+			}
+		}
+		return col;
 	}
 
-	vec4 sr3(float x)
-	{
-		return r1(vec4(x, x + .1, x + .2, 0)) * 2. - 1.;
-	}
-
-	vec4 stars(vec4 O, vec2 U)
-	{
-		vec2 iResolution = vec2(1280.0, 720.0);
-		vec2 R = iResolution.xy;
-		U = (U + U - R) / R.y;
-		O -= O + .3;
-		for (float i = 0.; i < 99.; i++)
-			O += flare(U - sr2(i) * R / R.y)           // rotating flare at random location
-			* r1(vec4(i + .2))                          // random scale
-			* (1. + sin(r1(vec4(i + .3)) * 6.)) * .1  // time pulse
-			* (1. + .1 * sr3(i + .4));               // random color - uncorrelated
-			  //* (1.+.1*sr3(i));                  // random color - correlated
-		return O;
-	}
+	//const float scale = 10.0;
+	const float NUM_LAYERS = 7.0;
 
 	void main()
 	{
+		vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
 		vec3 col = texture(screenTexture, TexCoords).rgb;
-		//FragColor = vec4(col, 1.0);
+
+		vec3 res_color = vec3(0.);
 
 		float brightness = dot(col.rgb, vec3(0.2126, 0.7152, 0.0722));
-		if (brightness > 0.4)
-			FragColor = vec4(col.rgb, 1.0);
+		if (brightness > 0.7)
+		{
+			//res_color = col.rgb;
+
+			for (float i = 0.; i < 1.; i += 1. / NUM_LAYERS) {
+				float depth = fract(i);
+
+				float scale = mix(20., 10., depth);
+
+				vec2 gv = fract(uv * scale) - .5;
+				vec2 id = floor(uv * scale);
+				float step = 1. / scale;
+				vec2 cell_center_uv = id * step + vec2(step / 2.);
+
+				//float brightness = dot(texture(screenTexture, cell_center_uv).rgb, vec3(0.2126, 0.7152, 0.0722));
+
+				//if (brightness > 0.7)
+				{
+					float fade = depth * smoothstep(1., .4, depth);
+					res_color += StarLayer(uv * scale + i * 453.2) * fade;
+				}
+			}
+			
+		}
 		else
 		{
-			FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+			res_color = vec3(0.0, 0.0, 0.0);
 		}
 
 		//vec4 starColor = stars(vec4(1.0, 1.0, 1.0, 1.0), TexCoords);
 		//FragColor = vec4(col, 1.0);
 		//FragColor = starColor;
+
+		FragColor = vec4(res_color, 1.0);
+
 	}
 );
 //
@@ -309,7 +349,13 @@ void Window::GUI::Init(const char* glsl_version)
 	{
 		assert("Failed frame buffer !");
 	}
-	
+
+	int resolution_loc =  mFrameProgram->Uniform("uResolution");
+	mFrameProgram->Use();
+	mFrameProgram->SetFloat2(resolution_loc, glm::vec2(mTexture->GetWidth(), mTexture->GetHeight()));
+	mFrameProgram->StopUsing();
+
+	u_Time_Loc = mFrameProgram->Uniform("uTime");
 
 	//opencv
 	//-- 1. Load the cascades
@@ -353,9 +399,12 @@ void Window::GUI::DrawElements()
 	mFrameProgram->Use();
 	int tex_loc = mFrameProgram->Uniform("screenTexture");
 	mTexture->Activate(tex_loc);
+	mFrameProgram->SetFloat(u_Time_Loc, (float)glfwGetTime());
 	mQuad->Draw(gl::Primitive::TRIANGLES);
 	mFrameProgram->StopUsing();
 	mFramebuffer->UnBind(gl::BindType::ReadAndDraw);
+
+
 
 
 	gl::RenderContext::Clear(gl::BufferBit::COLOR);
@@ -397,21 +446,23 @@ void Window::GUI::DrawElements()
 		int videoHeight = frame.rows;
 		unsigned char* image = cvMat2TexInput(frame);
 
+		ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(mTexture->GetWidth() * 2.f, 800.f), ImGuiCond_Always);
 		ImGui::Begin("Video", nullptr);
+		{
+			float div = 1.f;
 
-		float div = 2.f;
-
-		ImGui::Image((ImTextureID)mTexture->GetId(), ImVec2(mTexture->GetWidth() / div, mTexture->GetHeight() / div));
-
-		ImGui::Image((ImTextureID)mAttachedColor->GetId(), ImVec2(mAttachedColor->GetWidth() / div, mAttachedColor->GetHeight() / div));
-
+			ImGui::Image((ImTextureID)mTexture->GetId(), ImVec2(mTexture->GetWidth() / div, mTexture->GetHeight() / div));
+			ImGui::SameLine();
+			ImGui::Image((ImTextureID)mAttachedColor->GetId(), ImVec2(mAttachedColor->GetWidth() / div, mAttachedColor->GetHeight() / div));
+		}
 		ImGui::End();
 
 		mTexture->Update(0, 0, videoWidth, videoHeight, image);
 	}
 
-	static bool show_demo_window = true;
-	ImGui::ShowDemoWindow(&show_demo_window);
+	//static bool show_demo_window = true;
+	//ImGui::ShowDemoWindow(&show_demo_window);
 }
 
 void Window::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
